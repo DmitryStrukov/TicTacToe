@@ -13,6 +13,9 @@ class board {
     this.panel.className = 'panel';
     this.updateScore();
 
+    document.body.appendChild(this.panel);
+    document.body.appendChild(this.divBoard);
+
     //создаем массив ячеек [][]
     this.arrayCell = [];
     for (let i = 0; i < 3; i++) {
@@ -24,9 +27,6 @@ class board {
         this.divBoard.appendChild(this.arrayCell[i][j].getElem()); //вывод доски
       }
     }
-
-    document.body.appendChild(this.panel);
-    document.body.appendChild(this.divBoard);
   }
 
   updateScore() {

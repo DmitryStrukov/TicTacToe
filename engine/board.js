@@ -19,7 +19,7 @@ class Board {
       this.arrayCell[i] = [];
       for (let j = 0; j < 3; j++) {
         let idCell = i * 3 + j + 1;
-        let c = new Cell(idCell, this.divBoard.id, j, i);
+        let c = new Cell(idCell, this.divBoard.id);
         this.arrayCell[i][j] = c; // объекты ячеек в массив
         this.divBoard.appendChild(this.arrayCell[i][j].elem); //вывод доски
       }

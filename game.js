@@ -1,6 +1,4 @@
-let onePlayer = new player();
-onePlayer.makeX();
-let twoPlayer = new player();
-twoPlayer.makeO();
-let b = new board(onePlayer, twoPlayer);
+let onePlayer = new Player('X', 1);
+let twoPlayer = new Player('O', -1);
+let b = new Board(onePlayer, twoPlayer);
 b.startGame();

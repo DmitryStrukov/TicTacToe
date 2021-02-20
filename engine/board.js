@@ -1,4 +1,4 @@
-class board {
+class Board {
   constructor(onePlayer, twoPlayer) {
     //инициализация игрового поля
     this.divBoard = document.createElement('div');
@@ -8,12 +8,9 @@ class board {
     this.player2 = twoPlayer;
 
     //создаем панель счета
-    this.panel = document.createElement('h1');
-    this.panel.id = 'panel';
-    this.panel.className = 'panel';
-    this.updateScore();
+    this.panel = new Panel();
+    this.panel.updateScore(this.player1, this.player2);
 
-    document.body.appendChild(this.panel);
     document.body.appendChild(this.divBoard);
 
     //создаем массив ячеек [][]
@@ -22,59 +19,47 @@ class board {
       this.arrayCell[i] = [];
       for (let j = 0; j < 3; j++) {
         let idCell = i * 3 + j + 1;
-        let c = new cell(idCell, this.divBoard.id, j, i);
+        let c = new Cell(idCell, this.divBoard.id, j, i);
         this.arrayCell[i][j] = c; // объекты ячеек в массив
-        this.divBoard.appendChild(this.arrayCell[i][j].getElem()); //вывод доски
+        this.divBoard.appendChild(this.arrayCell[i][j].elem); //вывод доски
       }
     }
-  }
-
-  updateScore() {
-    this.panel.textContent =
-      ' Крестики -      ' +
-      this.player1.getScore() +
-      '        Нолики - ' +
-      this.player2.getScore();
   }
 
   checkRows() {
     for (let i = 0; i < 3; i++) {
       let sum =
-        this.arrayCell[i][0].getState() +
-        this.arrayCell[i][1].getState() +
-        this.arrayCell[i][2].getState();
-      if (sum == -3) this.player2.setWin(true);
-      if (sum == 3) this.player1.setWin(true);
+        this.arrayCell[i][0].state +
+        this.arrayCell[i][1].state +
+        this.arrayCell[i][2].state;
+      if (sum == -3) this.player2.winner = true;
+      if (sum == 3) this.player1.winner = true;
     }
   }
   checkCols() {
     for (let i = 0; i < 3; i++) {
       let sum =
-        this.arrayCell[0][i].getState() +
-        this.arrayCell[1][i].getState() +
-        this.arrayCell[2][i].getState();
-      if (sum == -3) this.player2.setWin(true);
-      if (sum == 3) this.player1.setWin(true);
+        this.arrayCell[0][i].state +
+        this.arrayCell[1][i].state +
+        this.arrayCell[2][i].state;
+      if (sum == -3) this.player2.winner = true;
+      if (sum == 3) this.player1.winner = true;
     }
   }
 
   checkDiagonals() {
-    for (let i = 0; i < 1; i++) {
-      let sum =
-        this.arrayCell[i][i].getState() +
-        this.arrayCell[i + 1][i + 1].getState() +
-        this.arrayCell[i + 2][i + 2].getState();
-      if (sum == -3) this.player2.setWin(true);
-      if (sum == 3) this.player1.setWin(true);
-    }
-    for (let i = 1; i > 0; i--) {
-      let sum =
-        this.arrayCell[i][i].getState() +
-        this.arrayCell[i + 1][i - 1].getState() +
-        this.arrayCell[i - 1][i + 1].getState();
-      if (sum == -3) this.player2.setWin(true);
-      if (sum == 3) this.player1.setWin(true);
-    }
+    let sumDiag1 =
+      this.arrayCell[0][0].state +
+      this.arrayCell[1][1].state +
+      this.arrayCell[2][2].state;
+
+    let sumDiag2 =
+      this.arrayCell[1][1].state +
+      this.arrayCell[2][0].state +
+      this.arrayCell[0][2].state;
+
+    if (sumDiag1 == 3 || sumDiag2 == 3) this.player1.winner = true;
+    if (sumDiag1 == -3 || sumDiag2 == -3) this.player2.winner = true;
   }
 
   /**
@@ -87,12 +72,12 @@ class board {
     this.checkCols();
     this.checkDiagonals();
 
-    if (this.player1.getWin()) {
-      this.player1.addScore();
+    if (this.player1.winner) {
+      this.player1.score++;
       return true;
     }
-    if (this.player2.getWin()) {
-      this.player2.addScore();
+    if (this.player2.winner) {
+      this.player2.score++;
       return true;
     }
     return false;
@@ -105,13 +90,13 @@ class board {
    * первый игрок
    */
   currentPlayer() {
-    if (this.player1.getAbilityMove() == true) {
-      this.player1.setAbilityMove(false);
-      this.player2.setAbilityMove(true);
+    if (this.player1.abilityMove == true) {
+      this.player1.abilityMove = false;
+      this.player2.abilityMove = true;
       return this.player1;
-    } else if (this.player2.getAbilityMove() == true) {
-      this.player2.setAbilityMove(false);
-      this.player1.setAbilityMove(true);
+    } else if (this.player2.abilityMove == true) {
+      this.player2.abilityMove = false;
+      this.player1.abilityMove = true;
       return this.player2;
     }
   }
@@ -123,7 +108,7 @@ class board {
   findById(id) {
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 3; j++) {
-        if (this.arrayCell[i][j].getId() == id) {
+        if (this.arrayCell[i][j].elem.id == id) {
           return this.arrayCell[i][j];
         }
       }
@@ -136,11 +121,11 @@ class board {
    */
   updateCell(player, idCell) {
     let c = this.findById(idCell);
-    if (c.getState() != 0) {
+    if (c.state != 0) {
       alert('Ячейка занята');
     } else {
-      c.setState(player.getState());
-      c.getElem().classList.add(player.getName());
+      c.state = player.state;
+      c.elem.classList.add(player.name);
     }
   }
   /**
@@ -149,7 +134,7 @@ class board {
   freeCell() {
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 3; j++) {
-        if (this.arrayCell[i][j].getState() == 0) {
+        if (this.arrayCell[i][j].state == 0) {
           return true;
         }
       }
@@ -164,13 +149,9 @@ class board {
   cleanCells() {
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 3; j++) {
-        this.arrayCell[i][j].setState(0);
-        this.arrayCell[i][j]
-          .getElem()
-          .classList.toggle(this.player1.getName(), false);
-        this.arrayCell[i][j]
-          .getElem()
-          .classList.toggle(this.player2.getName(), false);
+        this.arrayCell[i][j].state = 0;
+        this.arrayCell[i][j].elem.classList.toggle(this.player1.name, false);
+        this.arrayCell[i][j].elem.classList.toggle(this.player2.name, false);
       }
     }
   }
@@ -183,9 +164,9 @@ class board {
   gameRestart() {
     if (this.checkWinner() == true || this.freeCell() == false) {
       this.cleanCells();
-      this.updateScore();
-      this.player1.setWin(false);
-      this.player2.setWin(false);
+      this.panel.updateScore(this.player1, this.player2);
+      this.player1.winner = false;
+      this.player2.winner = false;
     }
   }
 

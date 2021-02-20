@@ -1,4 +1,4 @@
-class cell {
+class Cell {
   constructor(idCell, idBoard, col, row) {
     this.elem = document.createElement('div');
     this.elem.id = idCell;
@@ -8,29 +8,5 @@ class cell {
     this.row = row;
 
     document.getElementById(idBoard).appendChild(this.elem);
-  }
-
-  getCol() {
-    return this.col;
-  }
-
-  getRow() {
-    return this.row;
-  }
-
-  getState() {
-    return this.state;
-  }
-
-  setState(num) {
-    this.state = num;
-  }
-
-  getElem() {
-    return this.elem;
-  }
-
-  getId() {
-    return this.elem.id;
   }
 }
